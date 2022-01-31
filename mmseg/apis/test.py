@@ -10,6 +10,7 @@ import torch.distributed as dist
 import mmcv
 from mmcv.image import tensor2imgs
 from mmcv.runner import get_dist_info
+from mmseg.utils import get_dist_env
 
 
 def single_gpu_test(model, data_loader, show=False, out_dir=None, test_fps=False):
@@ -95,7 +96,7 @@ def multi_gpu_test(model, data_loader, tmpdir=None, gpu_collect=False):
     model.eval()
     results = []
     dataset = data_loader.dataset
-    rank, world_size = get_dist_info()
+    rank, world_size = get_dist_env()
     if rank == 0:
         prog_bar = mmcv.ProgressBar(len(dataset))
     for i, data in enumerate(data_loader):
@@ -121,7 +122,7 @@ def multi_gpu_test(model, data_loader, tmpdir=None, gpu_collect=False):
 
 def collect_results_cpu(result_part, size, tmpdir=None):
     """Collect results with CPU."""
-    rank, world_size = get_dist_info()
+    rank, world_size = get_dist_env()
     # create a tmp dir if it is not specified
     if tmpdir is None:
         MAX_LEN = 512
@@ -164,7 +165,7 @@ def collect_results_cpu(result_part, size, tmpdir=None):
 
 def collect_results_gpu(result_part, size):
     """Collect results with GPU."""
-    rank, world_size = get_dist_info()
+    rank, world_size = get_dist_env()
     # dump result part to tensor with pickle
     part_tensor = torch.tensor(
         bytearray(pickle.dumps(result_part)), dtype=torch.uint8, device='cuda')

@@ -10,6 +10,9 @@ from mmcv.utils import Registry, build_from_cfg
 from mmcv.utils.parrots_wrapper import DataLoader, PoolDataLoader
 from torch.utils.data import DistributedSampler
 
+from mmseg.utils import get_dist_env
+
+
 if platform.system() != 'Windows':
     # https://github.com/pytorch/pytorch/issues/973
     import resource
@@ -112,7 +115,7 @@ def build_dataloader(dataset,
     Returns:
         DataLoader: A PyTorch dataloader.
     """
-    rank, world_size = get_dist_info()
+    rank, world_size = get_dist_env()
     if dist:
         sampler = DistributedSampler(
             dataset, world_size, rank, shuffle=shuffle)
