@@ -198,4 +198,3 @@ if __name__ == "__main__":
 
     # now run your distributed training code
     run(global_rank, world_size, hostname, cfg, args, logger)
-
